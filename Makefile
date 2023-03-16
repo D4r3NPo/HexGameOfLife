@@ -63,29 +63,17 @@ $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 
 $(TARGETDIR):
 	@echo Creating $(TARGETDIR)
-ifeq (posix,$(SHELLTYPE))
 	$(SILENT) mkdir -p $(TARGETDIR)
-else
-	$(SILENT) mkdir $(subst /,\\,$(TARGETDIR))
-endif
 
 $(OBJDIR):
 	@echo Creating $(OBJDIR)
-ifeq (posix,$(SHELLTYPE))
 	$(SILENT) mkdir -p $(OBJDIR)
-else
-	$(SILENT) mkdir $(subst /,\\,$(OBJDIR))
-endif
+
 
 clean:
 	@echo Cleaning Start
-ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
-else
-	$(SILENT) if exist $(subst /,\\,$(TARGET)) del $(subst /,\\,$(TARGET))
-	$(SILENT) if exist $(subst /,\\,$(OBJDIR)) rmdir /s /q $(subst /,\\,$(OBJDIR))
-endif
 
 prebuild:
 	$(PREBUILDCMDS)
