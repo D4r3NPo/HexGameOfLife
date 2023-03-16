@@ -5,15 +5,21 @@ using namespace grapic;
 const int ScreenSize = 500;
 
 struct World {
-  int n;
+  int number;
 };
 
-void init(World &d) { d.n = 10; }
+World init() {
+  World world;
+  world.number = 10;
+  return world;
+}
 
-void draw(World &d) {
-  int i;
-  d.n = int((1.f + cos(elapsedTime())) * 10.f);
-  for (i = 0; i < d.n; i++) {
+void update(World &world) {
+  world.number = int((1.f + cos(elapsedTime())) * 10.f);
+}
+
+void draw(const World &world) {
+  for (int i = 0; i < world.number; i++) {
     color(20 * i, 255 - 20 * i, 128);
     rectangle(ScreenSize / 2 - 10 * i, ScreenSize / 2 - 10 * i,
               ScreenSize / 2 + 10 * i, ScreenSize / 2 + 10 * i);
@@ -21,17 +27,22 @@ void draw(World &d) {
 }
 
 int main(int, char **) {
-  World dat;
+
   bool stop = false;
+
   winInit("Program", ScreenSize, ScreenSize);
   winSetPosition(ScreenSize, -1, 0, -1, false);
-  init(dat);
   backgroundColor(100, 50, 200);
-  while (!stop) {
+
+  World world = init();
+
+  do {
     winClear();
-    draw(dat);
-    stop = winDisplay();
-  }
+    update(world);
+    draw(world);
+  } while (!winDisplay());
+
   winQuit();
+
   return 0;
 }
