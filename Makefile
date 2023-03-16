@@ -58,8 +58,6 @@ $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	@echo Linking Start
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
-#   Force make
-#	@rm -r $(OBJDIR)
 
 $(TARGETDIR):
 	@echo Creating $(TARGETDIR)
@@ -68,7 +66,6 @@ $(TARGETDIR):
 $(OBJDIR):
 	@echo Creating $(OBJDIR)
 	$(SILENT) mkdir -p $(OBJDIR)
-
 
 clean:
 	@echo Cleaning Start
