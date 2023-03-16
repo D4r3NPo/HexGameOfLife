@@ -59,7 +59,7 @@ $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 #   Force make
-	@rm -r $(OBJDIR)
+#	@rm -r $(OBJDIR)
 
 $(TARGETDIR):
 	@echo Creating $(TARGETDIR)
