@@ -1,15 +1,14 @@
 #include "Main.hpp"
 #include "Grapic.h"
-#include "HexGameOfLife.hpp"
+#include "World.h"
 
 using namespace grapic;
 using namespace std;
-using namespace HexGameOfLife;
 
 int main(int,char**)
 {
 	winInit("[Hex Game of Life]", Screen_Size, Screen_Size);
-	World world = HexGameOfLife::init();
+	World world = WorldInit();
 	do
 	{
 		winClear();

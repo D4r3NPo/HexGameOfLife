@@ -482,7 +482,7 @@ void pressSpace(bool isPrint = true);
     {
         Image im;
     };
-    void init(Data& d)
+    void WorldInit(Data& d)
     {
         d.im = image("ProgramData/grapic.bmp", true, 255, 255, 255, 255); //
    load the image "ProgramData/grapic.bmp" with transparency for the color

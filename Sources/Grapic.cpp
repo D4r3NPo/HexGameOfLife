@@ -85,8 +85,8 @@ void Grapic::init(const char *name, int w, int h, int posx, int posy,
   }
 
   // system("cd");
-  // setFont( 20, "ProgramData/ttf/Raleway-Regular.ttf");
-  setFont(20, "ProgramData/Fonts/Roboto-Regular.ttf");
+  // setFont( 20, "Data/ttf/Raleway-Regular.ttf");
+  setFont(20, "Data/Fonts/Roboto-Regular.ttf");
 
   // Creation de la fenetre
   if (m_window)
@@ -973,7 +973,7 @@ Image::Image(int w, int h)
 }
 
 void Image::init(int w, int h) {
-  cout << "Image: init " << w << " " << h << endl;
+  cout << "Image: WorldInit " << w << " " << h << endl;
   Grapic &g = Grapic::singleton();
   Uint32 rmask, gmask, bmask, amask;
 
@@ -1005,7 +1005,7 @@ void Image::init(int w, int h) {
   SDL_SetTextureBlendMode(m_texture, SDL_BLENDMODE_BLEND);
 
   // printInfo();
-  // cout<<"Image: init "<<w<<" "<<h<<"  ...ok"<<endl;
+  // cout<<"Image: WorldInit "<<w<<" "<<h<<"  ...ok"<<endl;
 }
 
 Image::Image(const char *filename, bool transparency, unsigned char r,
@@ -1123,7 +1123,7 @@ Image &Image::operator=(const Image &im) {
   //    if (m_texture)
   //        SDL_DestroyTexture(m_texture);
   //
-  //    init(im.m_surface->w, im.m_surface->h);
+  //    WorldInit(im.m_surface->w, im.m_surface->h);
   //    SDL_BlitSurface( im.m_surface,NULL,m_surface,nullptr);
   //    m_has_changed = true;
   return *this;

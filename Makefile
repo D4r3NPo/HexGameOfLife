@@ -17,6 +17,7 @@ OBJECTS = $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cpp,%.o,$(SRCS)))
 
 vpath %.cpp $(SRCDIR)
 vpath %.hpp $(SRCDIR)
+vpath %.h $(SRCDIR)
 vpath %.o $(OBJDIR)
 
 all: $(OBJDIR) $(TARGET)
@@ -37,3 +38,5 @@ clean:
 $(OBJDIR)/%.o: %.cpp
 	@echo $(notdir $<)
 	@$(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+
+%.cpp:

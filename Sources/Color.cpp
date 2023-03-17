@@ -1,5 +1,4 @@
 #include "Color.hpp"
-using namespace Interpolation;
 
 Color lerp(Color a,Color b,float t)
 {
