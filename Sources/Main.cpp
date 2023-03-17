@@ -4,16 +4,17 @@
 
 using namespace grapic;
 using namespace std;
+using namespace HexGameOfLife;
 
 int main(int,char**)
 {
-	winInit("[Sandbox]", Screen_Size, Screen_Size);
-	auto data = Newton::init();
+	winInit("[Hex Game of Life]", Screen_Size, Screen_Size);
+	World world = HexGameOfLife::init();
 	do
 	{
 		winClear();
-		update(data);
-		draw(data);
+		update(world);
+		draw(world);
 	}
 	while(!winDisplay());
 	winQuit();
