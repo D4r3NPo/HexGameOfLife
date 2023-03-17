@@ -3,7 +3,7 @@
 
 #include "Grapic.h"
 #include "Complex.hpp"
-#include "Sandbox.hpp"
+#include "Main.hpp"
 #include "Color.hpp"
 
 namespace Interpolation {

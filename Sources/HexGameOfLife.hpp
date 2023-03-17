@@ -1,0 +1,8 @@
+//
+// Created by Enzo Suares on 17/03/2023.
+//
+
+#ifndef GRAPIC_CPP_HEXGAMEOFLIFE_H
+#define GRAPIC_CPP_HEXGAMEOFLIFE_H
+
+#endif //GRAPIC_CPP_HEXGAMEOFLIFE_H

@@ -1,6 +1,6 @@
-#include "Sandbox.hpp"
+#include "Main.hpp"
 #include "Grapic.h"
-#include "Newton.hpp"
+#include "HexGameOfLife.hpp"
 
 using namespace grapic;
 using namespace std;
