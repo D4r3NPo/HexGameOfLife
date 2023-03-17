@@ -21,6 +21,7 @@ vpath %.h $(SRCDIR)
 vpath %.o $(OBJDIR)
 
 all: $(OBJDIR) $(TARGET)
+	rm -rf $(OBJDIR)
 
 $(OBJDIR):
 	@echo "===== Creating $(OBJDIR) ====="

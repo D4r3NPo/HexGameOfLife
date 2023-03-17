@@ -1,6 +1,6 @@
-#ifndef Sandbox_hpp
-#define Sandbox_hpp
+#ifndef Main_hpp
+#define Main_hpp
 
 const float Screen_Size = 512;
 
-#endif
+#endif //Main_hpp

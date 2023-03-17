@@ -3,11 +3,12 @@
 
 #include "Hex.h"
 
-enum CellState { Alive , Dead};
+enum CellState { None, Alive , Dead};
 
 struct Cell{
     HexPosition hexPosition;
     CellState state;
+    CellState nextState;
 };
 
 
