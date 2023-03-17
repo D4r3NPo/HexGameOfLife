@@ -1,6 +1,6 @@
 #include "Sandbox.hpp"
 #include "Grapic.h"
-#include "Newton.hpp"
+#include "SolarSystem.hpp"
 
 using namespace grapic;
 using namespace std;
@@ -8,7 +8,7 @@ using namespace std;
 int main(int,char**)
 {
 	winInit("[Sandbox]", Screen_Size, Screen_Size);
-	auto data = Newton::init();
+	auto data = SolarSystem::init();
 	do
 	{
 		winClear();

@@ -19,10 +19,10 @@ SolarSystem init()
 	system.Moon = system.Earth + mkComplex(Screen_Size/8, 0);
 	system.Mercury = worldCenter+ mkComplex(Screen_Size/6, 0);
 	
-	Sun = {grapic::image("Images/sun.png"),Screen_Size/16};
-	Earth = {grapic::image("Images/earth.png"),Screen_Size/32};
-	Mercury = {grapic::image("Images/mercury.png"),Screen_Size/64};
-	Moon = {grapic::image("Images/moon.png"),Screen_Size/64};
+	Sun = {grapic::image("Data/Images/sun.png"),Screen_Size/16};
+	Earth = {grapic::image("Data/Images/earth.png"),Screen_Size/32};
+	Mercury = {grapic::image("Data/Images/mercury.png"),Screen_Size/64};
+	Moon = {grapic::image("Data/Images/moon.png"),Screen_Size/64};
 	
 	return system;
 }
@@ -31,10 +31,10 @@ void update(SolarSystem& system)
 	system.deltaTime = elapsedTime() - system.Time;
 	system.Time = elapsedTime();
 	
-	system.Mercury = rotate(system.Mercury, system.Sun, system.deltaTime * 180);
-	system.Earth = rotate(system.Earth, system.Sun, system.deltaTime * 60);
-	system.Moon = rotate(system.Moon, system.Sun, system.deltaTime * 60);
-	system.Moon = rotate(system.Moon, system.Earth, system.deltaTime * 360);
+	system.Mercury = rotate(system.Mercury, system.Sun, system.deltaTime * 90);
+	system.Earth = rotate(system.Earth, system.Sun, system.deltaTime * 30);
+	system.Moon = rotate(system.Moon, system.Sun, system.deltaTime * 30);
+	system.Moon = rotate(system.Moon, system.Earth, system.deltaTime * 180);
 }
 
 void draw(const SolarSystem& system)

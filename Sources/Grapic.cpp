@@ -85,8 +85,8 @@ void Grapic::init(const char *name, int w, int h, int posx, int posy,
   }
 
   // system("cd");
-  // setFont( 20, "ProgramData/ttf/Raleway-Regular.ttf");
-  setFont(20, "ProgramData/Fonts/Roboto-Regular.ttf");
+  // setFont( 20, "Data/ttf/Raleway-Regular.ttf");
+  setFont(20, "Data/Fonts/Roboto-Regular.ttf");
 
   // Creation de la fenetre
   if (m_window)
