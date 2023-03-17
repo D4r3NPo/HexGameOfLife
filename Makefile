@@ -12,20 +12,14 @@ LDFLAGS   += -Wl,-x SDL/SDL2.framework/Versions/A/SDL2 SDL/SDL2_image.framework/
 RESFLAGS  += $(INCLUDES)
 LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(ARCH)
 
-SRCS = $(shell find $(SRCDIR) -name *.cc) $(shell find $(SRCDIR) -name *.cpp)
-OBJECTS = $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cc,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
-
-#OBJECTS := \
-	$(OBJDIR)/Grapic.o \
-	$(OBJDIR)/main.o \
-	$(OBJDIR)/Complex.o \
+SRCS = $(shell find $(SRCDIR) -name *.cpp)
+OBJECTS = $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(patsubst %.cpp,%.o,$(SRCS)))
 
 vpath %.cpp $(SRCDIR)
 vpath %.hpp $(SRCDIR)
 vpath %.o $(OBJDIR)
 
 all: $(OBJDIR) $(TARGET)
-	rm -r $(OBJDIR)
 
 $(OBJDIR):
 	@echo "===== Creating $(OBJDIR) ====="

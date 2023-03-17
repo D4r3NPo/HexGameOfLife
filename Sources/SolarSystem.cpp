@@ -12,7 +12,7 @@ PlanetInfo Sun,Earth,Mercury,Moon;
 SolarSystem init()
 {
 	backgroundColor(0,0,0,0);
-	SolarSystem system;
+	SolarSystem system{};
 	Complex worldCenter = mkComplex(Screen_Size/2,Screen_Size/2);
 	system.Sun = worldCenter;
 	system.Earth = worldCenter + mkComplex(Screen_Size/4, 0);
