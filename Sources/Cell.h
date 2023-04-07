@@ -13,4 +13,15 @@ struct Cell{
     CellState nextState;
 };
 
+Cell mkCell(int col,int row)
+{
+    Cell cell{};
+    cell.col = col;
+    cell.row = row;
+    cell.state = CellState::None;
+    cell.nextState = CellState::None;
+    for (int &neighbor: cell.neighbors) neighbor = -1;
+    return cell;
+}
+
 #endif //CELL_H

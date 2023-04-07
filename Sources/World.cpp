@@ -9,7 +9,7 @@ World WorldInit()
     world.deltaTime = 0;
     for (int col = 0; col < HCellCount; ++col) {
         for (int row = 0; row < VCellCount; ++row)
-            world.cells[col + row * HCellCount] = {col, row, CellState::None, CellState::None};
+            world.cells[col + row * HCellCount] = mkCell(col,row);
     }
     return world;
 }
@@ -40,7 +40,7 @@ void update(World &system)
 {
     system.deltaTime = elapsedTime() - system.Time;
     system.Time = elapsedTime();
-    for (auto cell : system.cells) DetermineNextState(cell);
+    for (auto cell : system.cells) DetermineNextState(system,cell);
     for (auto cell : system.cells) ApplyNextState(cell);
 }
 

@@ -23,7 +23,7 @@ struct World {
 World WorldInit();
 void update(World& system);
 void draw(const World& system);
-void DetermineNextState(Cell& cell);
+void DetermineNextState(World& world,Cell& cell);
 void ApplyNextState(Cell& cell);
 void update(const World& system,Cell& cell);
 void draw(const World& system,const Cell& cell);
