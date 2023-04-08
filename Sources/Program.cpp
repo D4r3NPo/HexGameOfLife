@@ -35,7 +35,7 @@ const int HCellCount = Screen_Size / CellSize;
 // Enumerations
 
 enum CellState { None, Alive, Dead };
-enum HexDir { O, NE, E, SE, SW, W, NW };
+enum HexDir { O = -1, NE, E, SE, SW, W, NW };
 
 // Complex
 
@@ -180,6 +180,7 @@ void setColor(Color col) { color(col.r,col.g,col.b,col.a); }
 struct Cell {
     HexPosition hexPosition;
     int col, row;
+
     int neighbors[6];
     CellState state;
     CellState nextState;
@@ -195,16 +196,25 @@ struct World {
     Cell cells[VCellCount * HCellCount];
 };
 
-Cell mkCell(int col, int row,CellState state = CellState::None) {
+bool isValidCoordinate(int col,int row) { return -1 < col && col < HCellCount && -1 < row && row < VCellCount; }
+
+Cell mkCell(int col, int row,CellState state) {
     Cell cell{};
     cell.col = col;
     cell.row = row;
-    cell.state = state;
     cell.hexPosition = mkHexPosition(col,row);
+    cell.state = state;
     cell.nextState = CellState::Dead;
-    for (int &neighbor : cell.neighbors) neighbor = -1;
+    if(isValidCoordinate(col + 1,row + 0)) cell.neighbors[HexDir::E] = (col + 1) + (row + 0 ) * HCellCount;
+    if(isValidCoordinate(col - 1,row + 0)) cell.neighbors[HexDir::W] = (col - 1) + (row + 0 ) * HCellCount;
+    if(isValidCoordinate(col + 0,row + 1)) cell.neighbors[HexDir::NE] = (col + 0) + (row + 1) * HCellCount;
+    if(isValidCoordinate(col + 0,row - 1)) cell.neighbors[HexDir::SW] = (col + 0) + (row - 1) * HCellCount;
+    if(isValidCoordinate(col - 1,row + 1)) cell.neighbors[HexDir::NW] = (col - 1) + (row + 1) * HCellCount;
+    if(isValidCoordinate(col - 1,row - 1)) cell.neighbors[HexDir::SW] = (col - 1) + (row - 1) * HCellCount;
+    cell.neighbors[HexDir::O] = -1;
     return cell;
 }
+
 
 HexVertex GetHexPoints(Cell cell) {
     Complex
@@ -238,6 +248,7 @@ World WorldInit() {
   return world;
 }
 
+// TODO Animate state applying
 void applyNextState(Cell &cell) { cell.state = cell.nextState; cell.nextState = CellState::Dead; }
 void findNextState(World &world, Cell &cell) {
 
@@ -252,7 +263,7 @@ void findNextState(World &world, Cell &cell) {
     // Reproduction
     if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState = CellState::Alive;
     // Random
-    if(aliveNeighbors == 0 && cell.state == CellState:: Dead && random()%100 > 90) cell.nextState = CellState::Alive;
+    //if(aliveNeighbors == 0 && cell.state == CellState:: Dead && random()%100 > 90) cell.nextState = CellState::Alive;
 
 
     /* Test
@@ -267,7 +278,8 @@ void findNextState(World &world, Cell &cell) {
 }
 void tick(World &world)
 {
-    // Cell
+    world.updateTime = world.Time;
+
     for (Cell& cell: world.cells) findNextState(world, cell);
     for (Cell& cell: world.cells) applyNextState(cell);
 }
@@ -278,19 +290,13 @@ void update(World &world) {
     world.dT = elapsedTime() - world.Time;
     world.Time = elapsedTime();
 
+    // Toggle PlayMode
     if(isKeyPressed(SDLK_SPACE)) world.pauseMode = !world.pauseMode;
 
-    if(world.pauseMode && isKeyPressed(SDLK_RIGHT))
-    {
-        world.updateTime = world.Time;
+    // Next Button and // Auto Update
+    if ((world.pauseMode && isKeyPressed(SDLK_RIGHT)) ||
+        (!world.pauseMode && world.Time - world.updateTime > UpdateDelay))
         tick(world);
-    }
-
-    if(!world.pauseMode && world.Time - world.updateTime > UpdateDelay)
-    {
-        world.updateTime = world.Time;
-        tick(world);
-    }
 }
 
 

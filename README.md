@@ -29,3 +29,4 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
   - Carnivore(Loup) meur si pas manger mouton pendant trop de tour, se déplace.
   - Loup : Noir, Mouton : BLanc, herbe : Verte
 - Statistiques afficher sur l'écran
+- (En/Dis)able Rules with menu
