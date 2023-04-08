@@ -455,10 +455,11 @@ void print(int x, int y, const char *txt);
     ~~~~~~~~~~~~~~~
 */
 inline void print(int x, int y, int nb) {
-  char txt[64];
-  sprintf(txt, "%d", nb);
-  print(x, y, txt);
-}
+        char txt[64];
+        snprintf(txt, 64, "%d",nb);
+        //sprintf(txt, "%d",nb);
+        print(x, y, txt);
+    }
 
 /** \brief Print the float nb, up left corner is (x,y)
     ~~~~~~~~~~~~~~~{.c}
@@ -467,10 +468,11 @@ inline void print(int x, int y, int nb) {
     ~~~~~~~~~~~~~~~
 */
 inline void print(int x, int y, float nb) {
-  char txt[64];
-  sprintf(txt, "%.2f", nb);
-  print(x, y, txt);
-}
+        char txt[64];
+        snprintf(txt, 64, "%.2f",nb);
+        //sprintf(txt, "%.2f", nb);
+        print(x, y, txt);
+    }
 
 /** \brief Stop the program until key 'space'is pressed
  */

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cmath>
+#include <string>
 
 #include "Grapic.h"
 
@@ -25,11 +26,11 @@ const Color Colors[]{
 
 // Constant
 
-const int VCellCount = (int)Screen_Size / CellSize;
-const int HCellCount = (int)Screen_Size / CellSize;
 const float Sqrt3d2 = 0.866025404f;
 const float Sqrt3   = 1.732050807f;
 const float Sqrt3d3 = 0.577350269f;
+const int VCellCount = Screen_Size / CellSize;
+const int HCellCount = Screen_Size / CellSize;
 
 // Enumerations
 
@@ -167,8 +168,8 @@ static HexPosition operator+(HexPosition a, HexDir b) { return a + Delta(b); }
 static HexPosition operator-(HexPosition a, HexDir b) { return a - Delta(b); }
 static HexPosition operator*(HexPosition a, int k) { return mkHexPosition(a.Q * k, a.R * k, a.S * k); }
 HexPosition HexPositionFromPosition(Complex position) { return Snap(position); }
-static int Length(HexPosition hexPosition) { return (abs(hexPosition.Q) + abs(hexPosition.R) + abs(hexPosition.S)) / 2; }
-static int Distance(HexPosition a, HexPosition b) { return Length(a - b); }
+//static int Length(HexPosition hexPosition) { return (abs(hexPosition.Q) + abs(hexPosition.R) + abs(hexPosition.S)) / 2; }
+//static int Distance(HexPosition a, HexPosition b) { return Length(a - b); }
 
 // Tools
 
@@ -189,6 +190,8 @@ struct World {
 
     float updateTime;
 
+    bool pauseMode;
+
     Cell cells[VCellCount * HCellCount];
 };
 
@@ -198,7 +201,7 @@ Cell mkCell(int col, int row,CellState state = CellState::None) {
     cell.row = row;
     cell.state = state;
     cell.hexPosition = mkHexPosition(col,row);
-    cell.nextState = CellState::None;
+    cell.nextState = CellState::Dead;
     for (int &neighbor : cell.neighbors) neighbor = -1;
     return cell;
 }
@@ -222,17 +225,21 @@ World WorldInit() {
   world.Time = 0;
   world.dT = 0;
   world.updateTime = 0;
+  world.pauseMode = true;
   for (int col = 0; col < HCellCount; ++col)
     for (int row = 0; row < VCellCount; ++row)
       world.cells[col + row * HCellCount] = mkCell(col, row, CellState::Dead);
 
   // Test
-  world.cells[21].state = Alive;
+
+  world.cells[4 + 6 * HCellCount].state = Alive;
+  world.cells[5 + 6 * HCellCount].state = Alive;
 
   return world;
 }
 
-void DetermineNextState(World &world, Cell &cell) {
+void applyNextState(Cell &cell) { cell.state = cell.nextState; cell.nextState = CellState::Dead; }
+void findNextState(World &world, Cell &cell) {
 
     int aliveNeighbors = 0;
     for (int &neighbor: cell.neighbors)
@@ -240,19 +247,30 @@ void DetermineNextState(World &world, Cell &cell) {
             aliveNeighbors++;
 
     // Rules
-    // Test
+    // Overpopulation
+    if(aliveNeighbors > 3) cell.nextState = CellState::Dead;
+    // Reproduction
+    if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState = CellState::Alive;
+    // Random
+    if(aliveNeighbors == 0 && cell.state == CellState:: Dead && random()%100 > 90) cell.nextState = CellState::Alive;
+
+
+    /* Test
     switch (cell.state) {
 
         case None:  cell.nextState = CellState::Alive; break;
         case Alive: cell.nextState = CellState::Dead;  break;
         case Dead:  cell.nextState = CellState::Alive; break;
-    }
+    }*/
 
-    // if(aliveNeighbors > 3) cell.nextState = CellState::Dead;
-    // if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState =
-    // CellState::Alive;
+
 }
-void ApplyNextState(Cell &cell) { cell.state = cell.nextState; cell.nextState = CellState::None; }
+void tick(World &world)
+{
+    // Cell
+    for (Cell& cell: world.cells) findNextState(world, cell);
+    for (Cell& cell: world.cells) applyNextState(cell);
+}
 
 void update(World &world) {
 
@@ -260,22 +278,35 @@ void update(World &world) {
     world.dT = elapsedTime() - world.Time;
     world.Time = elapsedTime();
 
-    if(world.Time - world.updateTime > UpdateDelay)
+    if(isKeyPressed(SDLK_SPACE)) world.pauseMode = !world.pauseMode;
+
+    if(world.pauseMode && isKeyPressed(SDLK_RIGHT))
     {
         world.updateTime = world.Time;
+        tick(world);
+    }
 
-        // Cell
-        for (Cell& cell: world.cells) DetermineNextState(world, cell);
-        for (Cell& cell: world.cells) ApplyNextState(cell);
+    if(!world.pauseMode && world.Time - world.updateTime > UpdateDelay)
+    {
+        world.updateTime = world.Time;
+        tick(world);
     }
 }
 
+
+
 void draw(const World &system, const Cell &cell) {
-    switch (cell.state) {
-        case None: setColor(Colors[CellState::None]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
-        case Alive: setColor(Colors[CellState::Alive]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
-        case Dead: setColor(Colors[CellState::Dead]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
-    }
+
+    // Current Cell
+    setColor(Colors[cell.state]);
+    polygonFill(GetHexPoints(cell).Vertex, 6);
+    Complex position = PositionFromHexPosition(cell.hexPosition);
+    color(255,45,45,255);
+    print(position.re + 10,position.im,to_string(cell.col).c_str());
+    color(45,255,45,255);
+    print(position.re - 10,position.im, to_string(cell.row).c_str());
+
+    // HexGrid
     setColor({0,0,0,255});
     polygon(GetHexPoints(cell).Vertex, 6);
 }
@@ -284,6 +315,7 @@ void draw(const World &system) { for (Cell cell: system.cells) draw(system, cell
 
 int main(int, char **) {
     winInit("[Hex Game of Life]", Screen_Size, Screen_Size);
+    setKeyRepeatMode(false);
     World world = WorldInit();
     do {
         winClear();

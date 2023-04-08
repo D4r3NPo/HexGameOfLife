@@ -16,6 +16,7 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - Dessin des Hexagones
 - Coordonnées Hexagonal
 - Structure du programme
+- Play/Pause + NextStep Button
 
 # Maybe
 - ▶️Animation des changement d'état
@@ -27,3 +28,4 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
   - Herbivore(Mouton) qui mange un de pelouse sinon meur, se déplace si deux , et se reproduit si a proximité d'un autre herbivore et que suffisment de nourriture présnete
   - Carnivore(Loup) meur si pas manger mouton pendant trop de tour, se déplace.
   - Loup : Noir, Mouton : BLanc, herbe : Verte
+- Statistiques afficher sur l'écran
