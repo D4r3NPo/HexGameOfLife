@@ -151,10 +151,12 @@ struct World {
     float Time, dT;
     float updateTime;
     bool pauseMode;
+    bool displayHex;
     Cell cells[VCellCount * HCellCount];
 };
 
-bool isValidCoordinate(Hex location) { return -1 < location.col && location.col < HCellCount && -1 < location.row && location.row < VCellCount; }
+bool isValidCoordinate(int col,int row) { return -1 < col && col < HCellCount && -1 < row && row < VCellCount; }
+bool isValidCoordinate(Hex location) {return isValidCoordinate(location.col, location.row);}
 
 Cell mkCell(int col, int row,CellState state) {
     Cell cell{};
@@ -180,6 +182,7 @@ HexVertex GetHexPoints(Cell cell) {
     NE = rotate(N,position,300);
     return {{{N.re,N.im},{NW.re,NW.im},{SW.re,SW.im},{S.re,S.im},{SE.re,SE.im},{NE.re,NE.im},}};
 }
+void SetState(World& world,int col,int row,CellState state) { if (isValidCoordinate(col, row)) world.cells[col + row * HCellCount].state = state; }
 
 World WorldInit() {
     std::cout << "HCellCount: " << HCellCount << std::endl;
@@ -188,14 +191,23 @@ World WorldInit() {
     world.Time = 0;
     world.dT = 0;
     world.updateTime = 0;
+    world.displayHex = false;
     world.pauseMode = true;
     for (int col = 0; col < HCellCount; ++col)
         for (int row = 0; row < VCellCount; ++row)
             world.cells[col + row * HCellCount] = mkCell(col, row, CellState::Dead);
 
-    // Test
-    world.cells[4 + 6 * HCellCount].state = Alive;
-    world.cells[5 + 6 * HCellCount].state = Alive;
+    // Start Systems
+
+    /*// Flicker
+    SetState(world,4,6,Alive);
+    SetState(world,5,6,Alive);*/
+
+    /*//Clapper
+    SetState(world,4,6,Alive);
+    SetState(world,5,6,Alive);
+    SetState(world,5,7,Alive);
+    SetState(world,5,8,Alive);*/
 
     return world;
 }
@@ -242,20 +254,25 @@ void update(World &world) {
 
 
 
-void draw(const World &system, const Cell &cell) {
+void draw(const World &world, const Cell &cell) {
 
     // Current Cell
     setColor(Colors[cell.state]);
     polygonFill(GetHexPoints(cell).Vertex, 6);
-    Complex position = PositionFromHexPosition(cell.location);
-    color(255,45,45,255);
-    print(position.re + 10,position.im,to_string(cell.location.col).c_str());
-    color(45,255,45,255);
-    print(position.re - 10,position.im, to_string(cell.location.row).c_str());
 
     // HexGrid
     setColor({0,0,0,255});
     polygon(GetHexPoints(cell).Vertex, 6);
+
+    // Debug : Display Hexagon locations
+    if(world.displayHex)
+    {
+        Complex position = PositionFromHexPosition(cell.location);
+        color(255,45,45,255);
+        print(position.re + 10,position.im,to_string(cell.location.col).c_str());
+        color(45,255,45,255);
+        print(position.re - 10,position.im, to_string(cell.location.row).c_str());
+    }
 }
 
 void draw(const World &system) { for (Cell cell: system.cells) draw(system, cell); }

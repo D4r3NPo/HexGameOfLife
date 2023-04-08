@@ -28,5 +28,7 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
   - Herbivore(Mouton) qui mange un de pelouse sinon meur, se déplace si deux , et se reproduit si a proximité d'un autre herbivore et que suffisment de nourriture présnete
   - Carnivore(Loup) meur si pas manger mouton pendant trop de tour, se déplace.
   - Loup : Noir, Mouton : BLanc, herbe : Verte
-- Statistiques afficher sur l'écran
+- Statistiques afficher sur l'écran : nombre d'entité de chaque type, nombre d'étape
 - (En/Dis)able Rules with menu
+- Menu avec des système de départ
+- Export des Système de départ 
