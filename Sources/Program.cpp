@@ -182,6 +182,7 @@ HexVertex GetHexPoints(Cell cell) {
     NE = rotate(N,position,300);
     return {{{N.re,N.im},{NW.re,NW.im},{SW.re,SW.im},{S.re,S.im},{SE.re,SE.im},{NE.re,NE.im},}};
 }
+
 void SetState(World& world,int col,int row,CellState state) { if (isValidCoordinate(col, row)) world.cells[col + row * HCellCount].state = state; }
 
 World WorldInit() {
@@ -203,17 +204,17 @@ World WorldInit() {
     SetState(world,4,6,Alive);
     SetState(world,5,6,Alive);*/
 
-    /*//Clapper
+    //Clapper
     SetState(world,4,6,Alive);
-    SetState(world,5,6,Alive);
-    SetState(world,5,7,Alive);
-    SetState(world,5,8,Alive);*/
-
-    SetState(world,4,6,Alive);
-    SetState(world,4,8,Alive);
     SetState(world,5,6,Alive);
     SetState(world,5,7,Alive);
     SetState(world,5,8,Alive);
+
+    /*SetState(world,4,6,Alive);
+    SetState(world,4,8,Alive);
+    SetState(world,5,6,Alive);
+    SetState(world,5,7,Alive);
+    SetState(world,5,8,Alive);*/
 
     return world;
 }
@@ -229,11 +230,11 @@ void findNextState(World &world, Cell &cell) {
 
     // Rules
     // Overpopulation
-    if(aliveNeighbors > 3) cell.nextState = CellState::Dead;
+    if(aliveNeighbors > 5) cell.nextState = CellState::Dead;
     // Reproduction
     if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState = CellState::Alive;
     // Random
-    //if(aliveNeighbors == 0 && cell.state == CellState:: Dead && random()%100 > 90) cell.nextState = CellState::Alive;
+    //if(aliveNeighbors == 0 && cell.state == CellState:: Dead && random()%100 > 50) cell.nextState = CellState::Alive;
 }
 void tick(World &world)
 {
@@ -254,6 +255,12 @@ void update(World &world) {
         int x,y; mousePos(x, y);
         Hex hex = Snap(x,y);
         if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Alive);
+    }
+    if (isMousePressed(SDL_BUTTON_RIGHT))
+    {
+        int x,y; mousePos(x, y);
+        Hex hex = Snap(x,y);
+        if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Dead);
     }
 
     // Toggle PlayMode

@@ -7,7 +7,7 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 
 # TODO
 - Choisir les Règles de naissance 🌱et de mort. ☠️
-
+- Clear Button : kill all cell
 
 # InProgress
 - Déterminer les voisins de chaque cellule
@@ -33,3 +33,7 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - Menu avec des système de départ
 - Export des Système de départ 
 - Random Start System
+
+# Observations 
+- Augmenter la totélrance à la surpopulation ne détruit pas les flikers
+- Les vagues ne survive pas
