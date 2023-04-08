@@ -17,10 +17,10 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - Coordonnées Hexagonal
 - Structure du programme
 - Play/Pause + NextStep Button
+- Ajout de cellules avec la souris au runtime.
 
 # Maybe
 - ▶️Animation des changement d'état
-- Ajout de cellules avec la souris au runtime.
 - Plusieurs type de cellules
 - Movement des cellules
 - Plusieurs espèce : 
@@ -32,3 +32,4 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - (En/Dis)able Rules with menu
 - Menu avec des système de départ
 - Export des Système de départ 
+- Random Start System

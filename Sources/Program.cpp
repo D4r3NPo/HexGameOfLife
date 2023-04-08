@@ -209,6 +209,12 @@ World WorldInit() {
     SetState(world,5,7,Alive);
     SetState(world,5,8,Alive);*/
 
+    SetState(world,4,6,Alive);
+    SetState(world,4,8,Alive);
+    SetState(world,5,6,Alive);
+    SetState(world,5,7,Alive);
+    SetState(world,5,8,Alive);
+
     return world;
 }
 
@@ -242,6 +248,13 @@ void update(World &world) {
     // Time
     world.dT = elapsedTime() - world.Time;
     world.Time = elapsedTime();
+
+    if (isMousePressed(SDL_BUTTON_LEFT))
+    {
+        int x,y; mousePos(x, y);
+        Hex hex = Snap(x,y);
+        if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Alive);
+    }
 
     // Toggle PlayMode
      world.pauseMode  = isKeyPressed(SDLK_SPACE) ?  !world.pauseMode : -1;
