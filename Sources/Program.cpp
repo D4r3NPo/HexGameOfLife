@@ -257,7 +257,7 @@ void update(World &world) {
     }
 
     // Toggle PlayMode
-     world.pauseMode  = isKeyPressed(SDLK_SPACE) ?  !world.pauseMode : -1;
+     if(isKeyPressed(SDLK_SPACE)) world.pauseMode = !world.pauseMode;
 
     // Next Button and // Auto Update
     if ((world.pauseMode && isKeyPressed(SDLK_RIGHT)) ||
