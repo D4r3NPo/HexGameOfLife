@@ -6,10 +6,17 @@
 using namespace grapic;
 using namespace std;
 
+// Primary Structs
+
+struct HexPosition { int Q, R, S; };
+struct HexVertex { int Vertex[6][2]; };
+struct Complex { float re, im; };
+struct Color { int r, g, b, a; };
+
 // Variables
 
 const int Screen_Size = 512;
-const int CellSize = 75;
+const int CellSize = 32;
 const int VCellCount = (int)Screen_Size / CellSize;
 const int HCellCount = (int)Screen_Size / CellSize;
 const int CellCount = VCellCount * HCellCount;
@@ -17,37 +24,15 @@ const float Sqrt3d2 = 0.866025404f;
 const float Sqrt3 = 1.732050807f;
 const float Sqrt3d3 = 0.577350269f;
 const float Size = 1.0f;
+const Color Colors[]{
+    {255,45,255,255},
+    {45,255,45,255},
+    {0,0,0,0}};
 
 // Enumerations
 
-enum HexDir { O, NE, E, SE, SW, W, NW };
 enum CellState { None, Alive, Dead };
-
-// Structs
-
-struct HexPosition {
-  int Q, R, S;
-};
-struct HexVertex {
-  int Vertex[6][2];
-};
-struct Cell {
-  HexPosition hexPosition;
-  int col, row;
-  int neighbors[6];
-  CellState state;
-  CellState nextState;
-};
-struct Complex {
-  float re, im;
-};
-struct Color {
-  int r, g, b, a;
-};
-struct World {
-  float Time, deltaTime;
-  Cell cells[VCellCount * HCellCount];
-};
+enum HexDir { O, NE, E, SE, SW, W, NW };
 
 // Complex
 
@@ -92,7 +77,7 @@ Color lerp(Color a, Color b, float t) {
           lerp(a.a, b.a, t)};
 }
 
-// Hex Cell
+// HexCell
 
 Complex PositionFromHexPosition(HexPosition hexPosition) {
   return mkComplex(Size * (Sqrt3 * hexPosition.Q + Sqrt3d2 * hexPosition.R),
@@ -151,94 +136,94 @@ static HexPosition operator+(HexPosition a, HexPosition b) {
 }
 
 static HexPosition operator-(HexPosition a, HexPosition b) {
-  return mkHexPosition(a.Q - b.Q, a.R - b.R, a.S - b.S);
+    return mkHexPosition(a.Q - b.Q, a.R - b.R, a.S - b.S);
 }
 HexPosition Delta(HexDir dir) {
-  switch (dir) {
-  case O:
-    return mkHexPosition(0, 0, 0);
-  case NE:
-    return mkHexPosition(1, -1, 0);
-  case E:
-    return mkHexPosition(1, 0, -1);
-  case SE:
-    return mkHexPosition(0, 1, -1);
-  case SW:
-    return mkHexPosition(-1, 1, 0);
-  case W:
-    return mkHexPosition(-1, 0, 1);
-  case NW:
-    return mkHexPosition(0, -1, 1);
-  }
+    switch (dir) {
+        case O:return mkHexPosition(0, 0, 0);
+        case NE:return mkHexPosition(1, -1, 0);
+        case E:return mkHexPosition(1, 0, -1);
+        case SE:return mkHexPosition(0, 1, -1);
+        case SW:return mkHexPosition(-1, 1, 0);
+        case W:return mkHexPosition(-1, 0, 1);
+        case NW:return mkHexPosition(0, -1, 1);
+    }
 }
 
 HexDir Opposite(HexDir dir) {
-  switch (dir) {
-  case O:
-    return HexDir::O;
-  case NE:
-    return HexDir::SW;
-  case E:
-    return HexDir::W;
-  case SE:
-    return HexDir::NW;
-  case SW:
-    return HexDir::NE;
-  case W:
-    return HexDir::E;
-  case NW:
-    return HexDir::SE;
-  }
+    switch (dir) {
+        case O:return HexDir::O;
+        case NE:return HexDir::SW;
+        case E:return HexDir::W;
+        case SE:return HexDir::NW;
+        case SW:return HexDir::NE;
+        case W:return HexDir::E;
+        case NW:return HexDir::SE;
+    }
 }
 
 static HexPosition operator+(HexPosition a, HexDir b) { return a + Delta(b); }
 static HexPosition operator-(HexPosition a, HexDir b) { return a - Delta(b); }
-static HexPosition operator*(HexPosition a, int k) {
-  return mkHexPosition(a.Q * k, a.R * k, a.S * k);
-}
+static HexPosition operator*(HexPosition a, int k) { return mkHexPosition(a.Q * k, a.R * k, a.S * k); }
 HexPosition HexPositionFromPosition(Complex position) { return Snap(position); }
-static int Length(HexPosition hexPosition) {
-  return (abs(hexPosition.Q) + abs(hexPosition.R) + abs(hexPosition.S)) / 2;
-}
+static int Length(HexPosition hexPosition) { return (abs(hexPosition.Q) + abs(hexPosition.R) + abs(hexPosition.S)) / 2; }
 static int Distance(HexPosition a, HexPosition b) { return Length(a - b); }
-Cell mkCell(int col, int row) {
+
+// Tools
+
+void setColor(Color col) { color(col.r,col.g,col.b,col.a); }
+
+// Game of Life
+
+struct Cell {
+    HexPosition hexPosition;
+    int col, row;
+    int neighbors[6];
+    CellState state;
+    CellState nextState;
+};
+
+struct World {
+    float Time, deltaTime;
+    Cell cells[VCellCount * HCellCount];
+};
+
+Cell mkCell(int col, int row,CellState state = CellState::None) {
     Cell cell{};
-    cell.hexPosition = mkHexPosition(col,row);
     cell.col = col;
     cell.row = row;
-    cell.state = CellState::None;
+    cell.state = state;
+    cell.hexPosition = mkHexPosition(col,row);
     cell.nextState = CellState::None;
-    for (int &neighbor : cell.neighbors)
-        neighbor = -1;
+    for (int &neighbor : cell.neighbors) neighbor = -1;
     return cell;
 }
+
 HexVertex GetHexPoints(Cell cell,float cellSize) {
-    Complex position = PositionFromHexPosition(cell.hexPosition) * cellSize;
-    Complex N = position + mkComplex(0,cellSize);
-    Complex NW = rotate(N,position,60);
-    Complex SW = rotate(N,position,120);
-    Complex S = rotate(N,position,180);
-    Complex SE = rotate(N,position,240);
-    Complex NE = rotate(N,position,300);
-    return {{
-                    {N.re,N.im},
-                    {NW.re,NW.im},
-                    {SW.re,SW.im},
-                    {S.re,S.im},
-                    {SE.re,SE.im},
-                    {NE.re,NE.im},
-            }};
+    Complex
+    position = PositionFromHexPosition(cell.hexPosition) * cellSize,
+    N = position + mkComplex(0,cellSize),
+    NW = rotate(N,position,60),
+    SW = rotate(N,position,120),
+    S = rotate(N,position,180),
+    SE = rotate(N,position,240),
+    NE = rotate(N,position,300);
+    return {{{N.re,N.im},{NW.re,NW.im},{SW.re,SW.im},{S.re,S.im},{SE.re,SE.im},{NE.re,NE.im},}};
 }
+
 World WorldInit() {
   std::cout << "HCellCount: " << HCellCount << std::endl;
   std::cout << "VCellCount: " << VCellCount << std::endl;
   World world = {};
   world.Time = 0;
   world.deltaTime = 0;
-  for (int col = 0; col < HCellCount; ++col) {
+  for (int col = 0; col < HCellCount; ++col)
     for (int row = 0; row < VCellCount; ++row)
-      world.cells[col + row * HCellCount] = mkCell(col, row);
-  }
+      world.cells[col + row * HCellCount] = mkCell(col, row, CellState::Dead);
+
+  // Test
+  world.cells[21].state = Alive;
+
   return world;
 }
 
@@ -274,7 +259,11 @@ void update(World &system) {
     ApplyNextState(cell);
 }
 void draw(const World &system, const Cell &cell) {
-  //circle(position.re * CellSize, position.im * CellSize, CellSize);
+    switch (cell.state) {
+        case None: setColor(Colors[CellState::None]); polygonFill(GetHexPoints(cell, CellSize).Vertex, 6); break;
+        case Alive: setColor(Colors[CellState::Alive]); polygonFill(GetHexPoints(cell, CellSize).Vertex, 6); break;
+        case Dead: setColor(Colors[CellState::Dead]); polygonFill(GetHexPoints(cell, CellSize).Vertex, 6); break;
+    }
   polygon(GetHexPoints(cell, CellSize).Vertex, 6);
 }
 
