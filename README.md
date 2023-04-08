@@ -6,13 +6,14 @@ En première version, uniquement un type de cellule avec deux état : mort ou vi
 Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactement deux voisin.
 
 # TODO
-- Règles de naissance 🌱et de mort. ☠️
+- Choisir les Règles de naissance 🌱et de mort. ☠️
 
 
 # InProgress
-- Dessin des Hexagones 
+- Déterminer les voisins de chaque cellule
 
 # Done
+- Dessin des Hexagones
 - Coordonnées Hexagonal
 - Structure du programme
 
@@ -21,3 +22,8 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - Ajout de cellules avec la souris au runtime.
 - Plusieurs type de cellules
 - Movement des cellules
+- Plusieurs espèce : 
+  - Pelouse qui se répand
+  - Herbivore(Mouton) qui mange un de pelouse sinon meur, se déplace si deux , et se reproduit si a proximité d'un autre herbivore et que suffisment de nourriture présnete
+  - Carnivore(Loup) meur si pas manger mouton pendant trop de tour, se déplace.
+  - Loup : Noir, Mouton : BLanc, herbe : Verte

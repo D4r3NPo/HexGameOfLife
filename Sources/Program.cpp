@@ -11,7 +11,7 @@ using namespace std;
 struct HexPosition { int Q, R, S; };
 struct HexVertex { int Vertex[6][2]; };
 struct Complex { float re, im; };
-struct Color { int r, g, b, a; };
+struct Color { int r, g, b, a;};
 
 // Variables
 
@@ -234,13 +234,13 @@ World WorldInit() {
 
 void DetermineNextState(World &world, Cell &cell) {
 
-    //int aliveNeighbors = 0;
-    //for (int &neighbor: cell.neighbors)
-        //if (neighbor != -1 && world.cells[neighbor].state == CellState::Alive)
-            //aliveNeighbors++;
+    int aliveNeighbors = 0;
+    for (int &neighbor: cell.neighbors)
+        if (neighbor != -1 && world.cells[neighbor].state == CellState::Alive)
+            aliveNeighbors++;
 
-
-    // Test Rules
+    // Rules
+    // Test
     switch (cell.state) {
 
         case None:  cell.nextState = CellState::Alive; break;
@@ -248,8 +248,6 @@ void DetermineNextState(World &world, Cell &cell) {
         case Dead:  cell.nextState = CellState::Alive; break;
     }
 
-
-    // True Rules
     // if(aliveNeighbors > 3) cell.nextState = CellState::Dead;
     // if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState =
     // CellState::Alive;
@@ -278,6 +276,8 @@ void draw(const World &system, const Cell &cell) {
         case Alive: setColor(Colors[CellState::Alive]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
         case Dead: setColor(Colors[CellState::Dead]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
     }
+    setColor({0,0,0,255});
+    polygon(GetHexPoints(cell).Vertex, 6);
 }
 
 void draw(const World &system) { for (Cell cell: system.cells) draw(system, cell); }
