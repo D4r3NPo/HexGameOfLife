@@ -37,3 +37,6 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 # Observations 
 - Augmenter la totélrance à la surpopulation ne détruit pas les flikers
 - Les vagues ne survive pas
+- l'état suivant par défaut est la mort donc il n'existe aucune structure stable que des flikers
+  - utiliser avec génération aléatoire pour détcter des flikers
+  - désactiver pour obtenir des structure stable
