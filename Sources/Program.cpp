@@ -17,17 +17,19 @@ struct Color { int r, g, b, a; };
 
 const int Screen_Size = 512;
 const int CellSize = 32;
+const float UpdateDelay = 1.0f;
+const Color Colors[]{
+        {255,45,255,255},
+        {45,255,45,255},
+        {0,0,0,0}};
+
+// Constant
+
 const int VCellCount = (int)Screen_Size / CellSize;
 const int HCellCount = (int)Screen_Size / CellSize;
-const int CellCount = VCellCount * HCellCount;
 const float Sqrt3d2 = 0.866025404f;
-const float Sqrt3 = 1.732050807f;
+const float Sqrt3   = 1.732050807f;
 const float Sqrt3d3 = 0.577350269f;
-const float Size = 1.0f;
-const Color Colors[]{
-    {255,45,255,255},
-    {45,255,45,255},
-    {0,0,0,0}};
 
 // Enumerations
 
@@ -43,7 +45,6 @@ Complex mkComplexExp(float r, float theta_deg) {
 }
 
 Complex operator+(Complex a, Complex b) { return {a.re + b.re, a.im + b.im}; }
-
 Complex operator-(Complex a, Complex b) { return {a.re - b.re, a.im - b.im}; }
 Complex operator*(float a, Complex b) { return {b.re * a, b.im * a}; }
 Complex operator*(Complex a, float b) { return b * a; }
@@ -80,8 +81,8 @@ Color lerp(Color a, Color b, float t) {
 // HexCell
 
 Complex PositionFromHexPosition(HexPosition hexPosition) {
-  return mkComplex(Size * (Sqrt3 * hexPosition.Q + Sqrt3d2 * hexPosition.R),
-                   Size * 1.5f * hexPosition.R);
+  return mkComplex(CellSize * (Sqrt3 * hexPosition.Q + Sqrt3d2 * hexPosition.R),
+                   CellSize * 1.5f * hexPosition.R);
 }
 
 HexPosition mkHexPosition(int col, int row) {
@@ -118,8 +119,8 @@ static HexPosition HexRound(float fQ, float fR) {
   return HexRound(fQ, fR, -fQ - fR);
 }
 static HexPosition Snap(float x, float z) {
-  return HexRound((Sqrt3d3 * x - (1.0f / 3.0f) * z) / Size,
-                  ((2.0f / 3.0f) * z) / Size);
+  return HexRound((Sqrt3d3 * x - (1.0f / 3.0f) * z) / CellSize,
+                  ((2.0f / 3.0f) * z) / CellSize);
 }
 static HexPosition Snap(Complex position) {
   return Snap(position.re, position.im);
@@ -184,7 +185,10 @@ struct Cell {
 };
 
 struct World {
-    float Time, deltaTime;
+    float Time, dT;
+
+    float updateTime;
+
     Cell cells[VCellCount * HCellCount];
 };
 
@@ -199,10 +203,10 @@ Cell mkCell(int col, int row,CellState state = CellState::None) {
     return cell;
 }
 
-HexVertex GetHexPoints(Cell cell,float cellSize) {
+HexVertex GetHexPoints(Cell cell) {
     Complex
-    position = PositionFromHexPosition(cell.hexPosition) * cellSize,
-    N = position + mkComplex(0,cellSize),
+    position = PositionFromHexPosition(cell.hexPosition),
+    N = position + mkComplex(0,CellSize),
     NW = rotate(N,position,60),
     SW = rotate(N,position,120),
     S = rotate(N,position,180),
@@ -216,7 +220,8 @@ World WorldInit() {
   std::cout << "VCellCount: " << VCellCount << std::endl;
   World world = {};
   world.Time = 0;
-  world.deltaTime = 0;
+  world.dT = 0;
+  world.updateTime = 0;
   for (int col = 0; col < HCellCount; ++col)
     for (int row = 0; row < VCellCount; ++row)
       world.cells[col + row * HCellCount] = mkCell(col, row, CellState::Dead);
@@ -228,56 +233,62 @@ World WorldInit() {
 }
 
 void DetermineNextState(World &world, Cell &cell) {
-  int aliveNeighbors = 0;
-  for (int &neighbor : cell.neighbors) {
-    if (neighbor != -1 && world.cells[neighbor].state == CellState::Alive)
-      aliveNeighbors++;
-  }
 
-  // Test Rules
-  if (cell.state == CellState::Alive)
-    cell.state = CellState::Dead;
-  else if (cell.state == CellState::Dead)
-    cell.state = CellState::Alive;
+    //int aliveNeighbors = 0;
+    //for (int &neighbor: cell.neighbors)
+        //if (neighbor != -1 && world.cells[neighbor].state == CellState::Alive)
+            //aliveNeighbors++;
 
-  // True Rules
-  // if(aliveNeighbors > 3) cell.nextState = CellState::Dead;
-  // if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState =
-  // CellState::Alive;
+
+    // Test Rules
+    switch (cell.state) {
+
+        case None:  cell.nextState = CellState::Alive; break;
+        case Alive: cell.nextState = CellState::Dead;  break;
+        case Dead:  cell.nextState = CellState::Alive; break;
+    }
+
+
+    // True Rules
+    // if(aliveNeighbors > 3) cell.nextState = CellState::Dead;
+    // if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState =
+    // CellState::Alive;
 }
-void ApplyNextState(Cell &cell) {
-  cell.state = cell.nextState;
-  cell.nextState = CellState::None;
+void ApplyNextState(Cell &cell) { cell.state = cell.nextState; cell.nextState = CellState::None; }
+
+void update(World &world) {
+
+    // Time
+    world.dT = elapsedTime() - world.Time;
+    world.Time = elapsedTime();
+
+    if(world.Time - world.updateTime > UpdateDelay)
+    {
+        world.updateTime = world.Time;
+
+        // Cell
+        for (Cell& cell: world.cells) DetermineNextState(world, cell);
+        for (Cell& cell: world.cells) ApplyNextState(cell);
+    }
 }
 
-void update(World &system) {
-  system.deltaTime = elapsedTime() - system.Time;
-  system.Time = elapsedTime();
-  for (Cell cell : system.cells)
-    DetermineNextState(system, cell);
-  for (Cell cell : system.cells)
-    ApplyNextState(cell);
-}
 void draw(const World &system, const Cell &cell) {
     switch (cell.state) {
-        case None: setColor(Colors[CellState::None]); polygonFill(GetHexPoints(cell, CellSize).Vertex, 6); break;
-        case Alive: setColor(Colors[CellState::Alive]); polygonFill(GetHexPoints(cell, CellSize).Vertex, 6); break;
-        case Dead: setColor(Colors[CellState::Dead]); polygonFill(GetHexPoints(cell, CellSize).Vertex, 6); break;
+        case None: setColor(Colors[CellState::None]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
+        case Alive: setColor(Colors[CellState::Alive]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
+        case Dead: setColor(Colors[CellState::Dead]); polygonFill(GetHexPoints(cell).Vertex, 6); break;
     }
-  polygon(GetHexPoints(cell, CellSize).Vertex, 6);
 }
 
-void draw(const World &system) {
-    for (Cell cell : system.cells) draw(system, cell);
-}
+void draw(const World &system) { for (Cell cell: system.cells) draw(system, cell); }
 
 int main(int, char **) {
-  winInit("[Hex Game of Life]", Screen_Size, Screen_Size);
-  World world = WorldInit();
-  do {
-    winClear();
-    update(world);
-    draw(world);
-  } while (!winDisplay());
-  winQuit();
+    winInit("[Hex Game of Life]", Screen_Size, Screen_Size);
+    World world = WorldInit();
+    do {
+        winClear();
+        update(world);
+        draw(world);
+    } while (!winDisplay());
+    winQuit();
 }
