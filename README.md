@@ -7,12 +7,14 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 
 # TODO
 - Choisir les Règles de naissance 🌱et de mort. ☠️
-- Clear Button : kill all cell
+- Grapic Menu pour chager des configuration préfaite.
 
 # InProgress
-- Déterminer les voisins de chaque cellule
-
+- SAVE/LOAD
+- 
 # Done
+- Déterminer les voisins de chaque cellule
+- Clear Button : kill all cell
 - Dessin des Hexagones
 - Coordonnées Hexagonal
 - Structure du programme

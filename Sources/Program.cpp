@@ -1,6 +1,8 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #include "Grapic.h"
 
@@ -16,7 +18,9 @@ struct Color { int r, g, b, a;};
 
 // Variables
 
-const int Screen_Size = 512;
+const string defaultWorld = "Data/default.txt";
+const string defaultSaveName = "Data/world.txt";
+const int Screen_Size = 768;
 const int CellSize = 32;
 const float UpdateDelay = 1.0f;
 const Color Colors[]{
@@ -184,6 +188,30 @@ HexVertex GetHexPoints(Cell cell) {
 }
 
 void SetState(World& world,int col,int row,CellState state) { if (isValidCoordinate(col, row)) world.cells[col + row * HCellCount].state = state; }
+void save(World& world,string name) {
+    ofstream savedWorld;
+    savedWorld.open(name);
+    for (Cell &cell: world.cells)
+        savedWorld << cell.state << "\n";
+    savedWorld.close();
+}
+void load(World& world,string name) {
+    ifstream loadedWorld (name);
+    string line;
+    if (loadedWorld.is_open())
+    {
+        int i = 0;
+        while (getline(loadedWorld, line))
+        {
+            world.cells[i].state = (CellState)std::stoi(line);
+            i++;
+        }
+
+        loadedWorld.close();
+    }
+
+    else cout << "Unable to open file";
+}
 
 World WorldInit() {
     std::cout << "HCellCount: " << HCellCount << std::endl;
@@ -198,6 +226,7 @@ World WorldInit() {
         for (int row = 0; row < VCellCount; ++row)
             world.cells[col + row * HCellCount] = mkCell(col, row, CellState::Dead);
 
+    load(world,defaultWorld);
     // Start Systems
 
     /*// Flicker
@@ -236,43 +265,53 @@ void findNextState(World &world, Cell &cell) {
     // Random
     //if(aliveNeighbors == 0 && cell.state == CellState:: Dead && random()%100 > 50) cell.nextState = CellState::Alive;
 }
-void tick(World &world)
-{
+void tick(World &world) {
     world.updateTime = world.Time;
 
-    for (Cell& cell: world.cells) findNextState(world, cell);
-    for (Cell& cell: world.cells) applyNextState(cell);
+    for (Cell &cell: world.cells) findNextState(world, cell);
+    for (Cell &cell: world.cells) applyNextState(cell);
 }
 
-void update(World &world) {
+void killAllCells(World& world)
+{
+    for (Cell &cell: world.cells) cell.state = CellState::Dead;
+}
+void spawnCellAtMousePosition(World& world){
+    int x,y; mousePos(x, y);
+    Hex hex = Snap(x,y);
+    if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Alive);
+}
+void killCellAtMousePosition(World& world)
+{
+    int x,y; mousePos(x, y);
+    Hex hex = Snap(x,y);
+    if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Dead);
+}
 
-    // Time
-    world.dT = elapsedTime() - world.Time;
-    world.Time = elapsedTime();
+void input(World& world)
+{
+    if (isMousePressed(SDL_BUTTON_LEFT)) spawnCellAtMousePosition(world);
+    if (isMousePressed(SDL_BUTTON_RIGHT)) killCellAtMousePosition(world);
+    if (isKeyPressed(SDLK_RETURN)) killAllCells(world);
+    if (isKeyPressed(SDLK_SPACE)) world.pauseMode = !world.pauseMode; // Toggle PlayMode
+    if (isKeyPressed(SDLK_s)) save(world,defaultSaveName);
+    if (isKeyPressed(SDLK_w)) save(world,defaultWorld);
+    if (isKeyPressed(SDLK_l)) load(world,defaultSaveName);
 
-    if (isMousePressed(SDL_BUTTON_LEFT))
-    {
-        int x,y; mousePos(x, y);
-        Hex hex = Snap(x,y);
-        if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Alive);
-    }
-    if (isMousePressed(SDL_BUTTON_RIGHT))
-    {
-        int x,y; mousePos(x, y);
-        Hex hex = Snap(x,y);
-        if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Dead);
-    }
-
-    // Toggle PlayMode
-     if(isKeyPressed(SDLK_SPACE)) world.pauseMode = !world.pauseMode;
 
     // Next Button and // Auto Update
     if ((world.pauseMode && isKeyPressed(SDLK_RIGHT)) ||
         (!world.pauseMode && world.Time - world.updateTime > UpdateDelay))
         tick(world);
 }
+void update(World &world) {
 
+    // Time
+    world.dT = elapsedTime() - world.Time;
+    world.Time = elapsedTime();
 
+    input(world);
+}
 
 void draw(const World &world, const Cell &cell) {
 
