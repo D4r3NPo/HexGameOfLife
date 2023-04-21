@@ -21,12 +21,12 @@ struct Color { int r, g, b, a;};
 const string defaultWorld = "Data/default.txt";
 const string defaultSaveName = "Data/world.txt";
 const int Screen_Size = 768;
-const int CellSize = 32;
+const int CellSize = 24;
 const float UpdateDelay = 1.0f;
 const Color Colors[]{
         {255,45,255,255},
         {45,255,45,255},
-        {0,0,0,0}};
+        {0,0,0,255}};
 
 // Constant
 
@@ -147,15 +147,14 @@ void setColor(Color col) { color(col.r,col.g,col.b,col.a); }
 struct Cell {
     Hex location;
     int neighbors[6];
-    CellState state;
-    CellState nextState;
+    CellState previousState,state,nextState;
 };
 
 struct World {
     float Time, dT;
     float updateTime;
     bool pauseMode;
-    bool displayHex;
+    bool isDisplayingHex,isDisplayingGrid;
     Cell cells[VCellCount * HCellCount];
 };
 
@@ -165,6 +164,7 @@ bool isValidCoordinate(Hex location) {return isValidCoordinate(location.col, loc
 Cell mkCell(int col, int row,CellState state) {
     Cell cell{};
     cell.location = mkHexPosition(col, row);
+    cell.previousState = CellState::Dead;
     cell.state = state;
     cell.nextState = CellState::Dead;
     for (int i = 0; i < 6; ++i) {
@@ -188,28 +188,25 @@ HexVertex GetHexPoints(Cell cell) {
 }
 
 void SetState(World& world,int col,int row,CellState state) { if (isValidCoordinate(col, row)) world.cells[col + row * HCellCount].state = state; }
-void save(World& world,string name) {
+
+void save(World& world,const string& name) {
     ofstream savedWorld;
     savedWorld.open(name);
-    for (Cell &cell: world.cells)
-        savedWorld << cell.state << "\n";
+    for (Cell &cell: world.cells) savedWorld << cell.state << "\n";
     savedWorld.close();
 }
-void load(World& world,string name) {
+
+void load(World& world,const string& name) {
     ifstream loadedWorld (name);
-    string line;
-    if (loadedWorld.is_open())
-    {
+    if (loadedWorld.is_open()) {
         int i = 0;
-        while (getline(loadedWorld, line))
-        {
-            world.cells[i].state = (CellState)std::stoi(line);
+        string line;
+        while (getline(loadedWorld, line)) {
+            world.cells[i].state = (CellState) std::stoi(line);
             i++;
         }
-
         loadedWorld.close();
     }
-
     else cout << "Unable to open file";
 }
 
@@ -220,36 +217,23 @@ World WorldInit() {
     world.Time = 0;
     world.dT = 0;
     world.updateTime = 0;
-    world.displayHex = false;
+    world.isDisplayingHex = false;
+    world.isDisplayingGrid = true;
     world.pauseMode = true;
     for (int col = 0; col < HCellCount; ++col)
         for (int row = 0; row < VCellCount; ++row)
             world.cells[col + row * HCellCount] = mkCell(col, row, CellState::Dead);
 
     load(world,defaultWorld);
-    // Start Systems
-
-    /*// Flicker
-    SetState(world,4,6,Alive);
-    SetState(world,5,6,Alive);*/
-
-    //Clapper
-    SetState(world,4,6,Alive);
-    SetState(world,5,6,Alive);
-    SetState(world,5,7,Alive);
-    SetState(world,5,8,Alive);
-
-    /*SetState(world,4,6,Alive);
-    SetState(world,4,8,Alive);
-    SetState(world,5,6,Alive);
-    SetState(world,5,7,Alive);
-    SetState(world,5,8,Alive);*/
-
     return world;
 }
 
-// TODO Animate state applying with interpolation
-void applyNextState(Cell &cell) { cell.state = cell.nextState; cell.nextState = CellState::Dead; }
+void applyNextState(Cell &cell)
+{
+    cell.previousState = cell.state;
+    cell.state = cell.nextState;
+    cell.nextState = CellState::Dead;
+}
 void findNextState(World &world, Cell &cell) {
 
     int aliveNeighbors = 0;
@@ -294,14 +278,14 @@ void input(World& world)
     if (isMousePressed(SDL_BUTTON_RIGHT)) killCellAtMousePosition(world);
     if (isKeyPressed(SDLK_RETURN)) killAllCells(world);
     if (isKeyPressed(SDLK_SPACE)) world.pauseMode = !world.pauseMode; // Toggle PlayMode
+    if (isKeyPressed(SDLK_1)) world.isDisplayingHex = !world.isDisplayingHex; // Toggle HexLocation
+    if (isKeyPressed(SDLK_2)) world.isDisplayingGrid = !world.isDisplayingGrid; // Toggle Grid
     if (isKeyPressed(SDLK_s)) save(world,defaultSaveName);
     if (isKeyPressed(SDLK_w)) save(world,defaultWorld);
     if (isKeyPressed(SDLK_l)) load(world,defaultSaveName);
 
-
     // Next Button and // Auto Update
-    if ((world.pauseMode && isKeyPressed(SDLK_RIGHT)) ||
-        (!world.pauseMode && world.Time - world.updateTime > UpdateDelay))
+    if ((world.pauseMode && isKeyPressed(SDLK_RIGHT)) || (!world.pauseMode && world.Time - world.updateTime > UpdateDelay))
         tick(world);
 }
 void update(World &world) {
@@ -315,16 +299,21 @@ void update(World &world) {
 
 void draw(const World &world, const Cell &cell) {
 
-    // Current Cell
-    setColor(Colors[cell.state]);
+    if (world.pauseMode) setColor(Colors[cell.state]);
+    else {
+        float t = world.Time * UpdateDelay - floor(world.Time * UpdateDelay);
+        setColor(lerp(Colors[cell.previousState], Colors[cell.state], t));
+    }
+
     polygonFill(GetHexPoints(cell).Vertex, 6);
 
-    // HexGrid
-    setColor({0,0,0,255});
-    polygon(GetHexPoints(cell).Vertex, 6);
+    if(world.isDisplayingGrid)
+    {
+        setColor({0,0,0,255});
+        polygon(GetHexPoints(cell).Vertex, 6);
+    }
 
-    // Debug : Display Hexagon locations
-    if(world.displayHex)
+    if(world.isDisplayingHex)
     {
         Complex position = PositionFromHexPosition(cell.location);
         color(255,45,45,255);

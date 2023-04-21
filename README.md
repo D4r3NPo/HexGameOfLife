@@ -1,17 +1,26 @@
 # Hex Game of Life
- Une version hexagonal du jeu de la vie de Conway.
+Une version hexagonal du jeu de la vie de Conway.
 
 En première version, uniquement un type de cellule avec deux état : mort ou vivant , qui seront défini à l'avance dans un l'initialisation. 
 
 Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactement deux voisin.
 
+# Shortcut
+- 1 pour afficher les coordonnés
+- 2 pour afficher la grille
+- flèche de droite pour passer à l'état suivant
+- espace pour enter en mode auto
+- entrer pour tuer toute les cellules 
+- w pour sauvegarder un monde de démarage 
+- s pour sauvegarder un monde
+- l pour charger un monde 
+
 # TODO
 - Choisir les Règles de naissance 🌱et de mort. ☠️
-- Grapic Menu pour chager des configuration préfaite.
+- Grapic Menu pour charger des configuration préfaite.
 
 # InProgress
-- SAVE/LOAD
-- 
+ 
 # Done
 - Déterminer les voisins de chaque cellule
 - Clear Button : kill all cell
@@ -20,6 +29,10 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - Structure du programme
 - Play/Pause + NextStep Button
 - Ajout de cellules avec la souris au runtime.
+- Animation des états grâce aux interpolations (en mode auto)
+- Savegarde et Chargement
+- Monde de démarage 
+
 
 # Maybe
 - ▶️Animation des changement d'état
