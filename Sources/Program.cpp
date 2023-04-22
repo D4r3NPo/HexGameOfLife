@@ -26,7 +26,7 @@ const float UpdateDelay = 1.0f;
 const Color Colors[]{
         {255,45,255,255},
         {45,255,45,255},
-        {0,0,0,255}};
+        {45,45,45,255}};
 
 // Constant
 
