@@ -19,9 +19,9 @@ vpath %.cpp $(SRCDIR)
 vpath %.hpp $(SRCDIR)
 vpath %.o $(OBJDIR)
 
-all: $(OBJDIR) $(TARGET) run
+all: $(OBJDIR) $(TARGET)
 
-run:
+launch:
 	./Program
 
 $(OBJDIR):
