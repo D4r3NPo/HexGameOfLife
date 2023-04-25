@@ -20,7 +20,8 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - Grapic Menu pour charger des configuration préfaite.
 
 # InProgress
- 
+- (En/Dis)able Rules with menu
+
 # Done
 - Déterminer les voisins de chaque cellule
 - Clear Button : kill all cell
@@ -32,10 +33,12 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
 - Animation des états grâce aux interpolations (en mode auto)
 - Savegarde et Chargement
 - Monde de démarage 
-
+- ▶️Animation des changement d'état
+- Export des Système de départ
+- Random Start System
 
 # Maybe
-- ▶️Animation des changement d'état
+
 - Plusieurs type de cellules
 - Movement des cellules
 - Plusieurs espèce : 
@@ -44,13 +47,9 @@ Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactem
   - Carnivore(Loup) meur si pas manger mouton pendant trop de tour, se déplace.
   - Loup : Noir, Mouton : BLanc, herbe : Verte
 - Statistiques afficher sur l'écran : nombre d'entité de chaque type, nombre d'étape
-- (En/Dis)able Rules with menu
-- Menu avec des système de départ
-- Export des Système de départ 
-- Random Start System
 
 # Observations 
-- Augmenter la totélrance à la surpopulation ne détruit pas les flikers
+- Augmenter la tolérance à la surpopulation ne détruit pas les flikers
 - Les vagues ne survive pas
 - l'état suivant par défaut est la mort donc il n'existe aucune structure stable que des flikers
   - utiliser avec génération aléatoire pour détcter des flikers
