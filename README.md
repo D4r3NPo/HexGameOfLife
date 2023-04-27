@@ -6,23 +6,23 @@ En première version, uniquement un type de cellule avec deux état : mort ou vi
 Elles meurrent si elles ont plus de 3 de voisin ou naissent si elles ont exactement deux voisin.
 
 # Shortcut
-- 1 pour afficher les coordonnés
-- 2 pour afficher la grille
+- 0 à 9 pour de/activer les règles
+- c pour afficher les coordonnés
+- g pour afficher la grille
 - flèche de droite pour passer à l'état suivant
 - espace pour enter en mode auto
 - entrer pour tuer toute les cellules 
-- w pour sauvegarder un monde de démarage 
+- d pour sauvegarder un monde de démarrage 
 - s pour sauvegarder un monde
 - l pour charger un monde 
 
 # TODO
 - Choisir les Règles de naissance 🌱et de mort. ☠️
-- Grapic Menu pour charger des configuration préfaite.
 
 # InProgress
-- (En/Dis)able Rules with menu
 
 # Done
+- Règles affichées et de/activable
 - Déterminer les voisins de chaque cellule
 - Clear Button : kill all cell
 - Dessin des Hexagones
