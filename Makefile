@@ -21,6 +21,9 @@ vpath %.o $(OBJDIR)
 
 all: $(OBJDIR) $(TARGET)
 
+launch:
+	./Program
+
 $(OBJDIR):
 	@echo "===== Creating $(OBJDIR) ====="
 	@mkdir -p $(OBJDIR)
