@@ -184,6 +184,8 @@ World WorldInit() {
     for (int col = 0; col < HCellCount; ++col)
         for (int row = 0; row < VCellCount; ++row)
             world.cells[col + row * HCellCount] = mkCell(col, row, CellState::Dead);
+    world.rules[0] = false;
+    for (int i = 1; i < MaxRules; ++i) world.rules[i] = true;
 
     load(world,defaultWorld);
     return world;
@@ -202,16 +204,17 @@ void findNextState(World& world, Cell &cell) {
     for (int &neighbor: cell.neighbors)
         if (neighbor != -1 && world.cells[neighbor].state == CellState::Alive)
             aliveNeighbors++;
-
     // Rules
     // Random Spawn
     if(world.rules[0]){ if(aliveNeighbors == 0 && cell.state == CellState:: Dead && random()%100 > 50) cell.nextState = CellState::Alive; }
     // Reproduction
-    if(world.rules[1]){ if(aliveNeighbors == 2 && cell.state == CellState::Dead) cell.nextState = CellState::Alive; }
+    if(world.rules[1]){ if((aliveNeighbors == 2 || aliveNeighbors == 3)  && cell.state == CellState::Dead) cell.nextState = CellState::Alive; }
     // Overpopulation
-    if(world.rules[2]){ if(aliveNeighbors > 5) cell.nextState = CellState::Dead; }
-    if(world.rules[3]){}
-    if(world.rules[4]){}
+    if(world.rules[2]){ if(aliveNeighbors > 4 && cell.state == CellState::Alive) cell.nextState = CellState::Dead; }
+    // Underpopulation
+    if(world.rules[3]){ if(aliveNeighbors < 1 && cell.state == CellState::Alive) cell.nextState = CellState::Dead; }
+    // Staying Alive
+    if(world.rules[4]){ if((aliveNeighbors == 3) && cell.state == CellState::Alive) cell.nextState = CellState::Alive; }
     if(world.rules[5]){}
     if(world.rules[6]){}
     if(world.rules[7]){}
@@ -225,9 +228,11 @@ void drawRules(World& world) {
             string("==== Rules ===\n"),
             string("[") + string(world.rules[0] ? "X" : "  ") + string("] 0 Random Spawn\n"),
             string("[") + string(world.rules[1] ? "X" : "  ") + string("] 1 Reproduction\n"),
-            string("[") + string(world.rules[2] ? "X" : "  ") + string("] 2 Overpopulation\n")
+            string("[") + string(world.rules[2] ? "X" : "  ") + string("] 2 Overpopulation\n"),
+            string("[") + string(world.rules[2] ? "X" : "  ") + string("] 3 Underpopulation\n"),
+            string("[") + string(world.rules[2] ? "X" : "  ") + string("] 4 StayingAlive\n")
     };
-    for (int i = 0; i < 4; ++i) print(25, Screen_Size - (25 * (i + 1)), rules[i].c_str());
+    for (int i = 0; i < 6; ++i) print(25, Screen_Size - (25 * (i + 1)), rules[i].c_str());
 }
 void updateRules(World& world)
 {
@@ -260,7 +265,6 @@ void killCellAtMousePosition(World& world)
     Hex hex = Snap(x,y);
     if(isValidCoordinate(hex)) SetState(world,hex.col,hex.row,CellState::Dead);
 }
-
 
 void input(World& world)
 {
